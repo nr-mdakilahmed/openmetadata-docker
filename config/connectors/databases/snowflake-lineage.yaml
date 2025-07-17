@@ -1,0 +1,25 @@
+source:
+  type: snowflake-lineage
+  serviceName: snowflake-code
+  sourceConfig:
+    config:
+      type: DatabaseLineage
+      queryLogDuration: 1
+      parsingTimeoutLimit: 300
+      resultLimit: 1000
+      overrideViewLineage: false
+      processViewLineage: true
+      processQueryLineage: true
+      processStoredProcedureLineage: true
+      threads: 1
+sink:
+  type: metadata-rest
+  config: {}
+workflowConfig:
+  loggerLevel: INFO
+  openMetadataServerConfig:
+    hostPort: ${OPENMETADATA_SERVER_HOST_PORT}
+    authProvider: openmetadata
+    securityConfig:
+      jwtToken: ${OPENMETADATA_JWT_TOKEN}
+    storeServiceConnection: true

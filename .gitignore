@@ -1,0 +1,83 @@
+# Logs
+logs/
+*.log
+
+# Environment files (sensitive data) - CRITICAL SECURITY
+.env.local
+.env.production
+.env.*.local
+.env.connectors
+.env.backup
+.env.dev
+.env.test
+.env.staging
+
+# Docker volumes (persistent data)
+docker-volume/db-data/*
+!docker-volume/db-data/.gitkeep
+
+# Generated config files
+config/**/*.generated.*
+config/**/*.template.*
+
+# Secrets directory (if created)
+config/secrets/
+
+# VS Code workspace settings (optional)
+.vscode/launch.json
+.vscode/tasks.json
+
+# MacOS
+.DS_Store
+
+# Backup files
+*.backup
+*.bak
+backup_*.sql
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# IDE files
+.idea/
+*.swp
+*.swo
+
+# Python (if any scripts are added)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+
+# Node.js (if any JS tools are added)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build artifacts
+dist/
+build/
+.cache/
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+
+# Security - Additional patterns to prevent credential leaks
+*.key
+*.pem
+*.p12
+*.pfx
+secrets.txt
+credentials.json
+
+# Node.js (if any frontend customizations)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

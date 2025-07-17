@@ -1,0 +1,8 @@
+{
+  "mcp.timeout": 30000,
+  "mcp.retryAttempts": 3,
+  "mcp.keepAlive": true,
+  "mcp.reconnectOnError": true,
+  "terminal.integrated.allowChords": false,
+  "extensions.autoUpdate": false
+}

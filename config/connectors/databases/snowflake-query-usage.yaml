@@ -1,0 +1,27 @@
+source:
+  type: snowflake-usage
+  serviceName: snowflake-code
+  sourceConfig:
+    config:
+      type: DatabaseUsage
+      queryLogDuration: 7
+      stageFileLocation: /tmp/query_log
+processor:
+  type: query-parser
+  config: {}
+stage:
+  type: table-usage
+  config:
+    filename: /tmp/athena_usage
+bulkSink:
+  type: metadata-usage
+  config:
+    filename: /tmp/athena_usage
+workflowConfig:
+  loggerLevel: INFO
+  openMetadataServerConfig:
+    hostPort: ${OPENMETADATA_SERVER_HOST_PORT}
+    authProvider: openmetadata
+    securityConfig:
+      jwtToken: ${OPENMETADATA_JWT_TOKEN}
+    storeServiceConnection: true

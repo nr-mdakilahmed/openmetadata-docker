@@ -1,0 +1,39 @@
+source:
+  type: fivetran
+  serviceName: ${FIVETRAN_SERVICE_NAME}
+  serviceConnection:
+    config:
+      type: Fivetran
+      apiKey: ${FIVETRAN_API_KEY}
+      apiSecret: ${FIVETRAN_API_SECRET}
+      hostPort: ${FIVETRAN_HOST_PORT}
+      limit: ${FIVETRAN_LIMIT}
+  sourceConfig:
+    config:
+      type: PipelineMetadata
+      # Enhanced lineage configuration for automatic data flow capture
+      lineageInformation:
+        # Add your Snowflake service name for automatic lineage mapping
+        dbServiceNames:
+          - "snowflake-code"
+        storageServiceNames:
+          - "s3_iceberg_fivetran_prod"
+      includeTags: true
+      includeLineage: true
+      includeOwners: true
+      # Enable enhanced lineage extraction
+      enableDebugLog: true
+      pipelineFilterPattern:
+        includes: [".*"]
+        excludes: []
+sink:
+  type: metadata-rest
+  config: {}
+workflowConfig:
+  loggerLevel: INFO
+  openMetadataServerConfig:
+    hostPort: ${OPENMETADATA_SERVER_HOST_PORT}
+    authProvider: openmetadata
+    securityConfig:
+      jwtToken: ${OPENMETADATA_JWT_TOKEN}
+    storeServiceConnection: true
