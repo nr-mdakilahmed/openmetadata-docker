@@ -2,6 +2,14 @@
 # OpenMetadata MCP Health Check Script
 # This script checks the health of OpenMetadata services and MCP connectivity
 
+# Load environment variables
+ENV_FILE="${ENV_FILE:-.env.local}"
+if [ -f "$ENV_FILE" ]; then
+    source "$ENV_FILE"
+else
+    echo "⚠️ Warning: Environment file $ENV_FILE not found. Using defaults."
+fi
+
 echo "🔍 Checking OpenMetadata services health..."
 
 # Check Docker containers
@@ -25,7 +33,8 @@ echo ""
 
 # Check MySQL connection
 echo "🗄️ Checking MySQL connection:"
-docker exec openmetadata_mysql mysql -u root -ppassword -e "SELECT 1 as connection_test;" 2>/dev/null
+MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD:-password}"
+docker exec openmetadata_mysql mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "SELECT 1 as connection_test;" 2>/dev/null
 if [ $? -eq 0 ]; then
     echo "✅ MySQL connection is working"
 else

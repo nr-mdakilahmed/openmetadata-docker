@@ -6,14 +6,18 @@
 echo "🔍 Validating OpenMetadata Environment Configuration..."
 echo "============================================================"
 
-# Source the .env file
-if [ -f .env ]; then
+# Use provided env file or default to .env
+ENV_FILE=${1:-.env}
+
+# Source the environment file
+if [ -f "$ENV_FILE" ]; then
     set -a
-    source .env
+    source "$ENV_FILE"
     set +a
-    echo "✅ .env file loaded successfully"
+    echo "✅ $ENV_FILE file loaded successfully"
 else
-    echo "❌ .env file not found!"
+    echo "❌ $ENV_FILE file not found!"
+    echo "📝 Please create $ENV_FILE with required environment variables"
     exit 1
 fi
 

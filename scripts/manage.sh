@@ -14,6 +14,14 @@ NC='\033[0m' # No Color
 # Configuration
 COMPOSE_FILE="docker-compose.yml"
 BACKUP_DIR="backups"
+ENV_FILE="${ENV_FILE:-.env.local}"  # Use .env.local by default, can be overridden
+
+# Ensure required files exist
+if [ ! -f "$ENV_FILE" ]; then
+    echo "ERROR: Environment file $ENV_FILE not found!"
+    echo "Please copy .env to .env.local and configure with your actual values."
+    exit 1
+fi
 
 # Ensure backup directory exists
 mkdir -p $BACKUP_DIR
@@ -63,7 +71,7 @@ log_error() {
 
 start_services() {
     log_info "Starting OpenMetadata services..."
-    docker-compose -f $COMPOSE_FILE up -d
+    docker-compose --env-file $ENV_FILE -f $COMPOSE_FILE up -d
     log_success "Services started successfully!"
     echo ""
     log_info "Waiting for services to be ready..."
@@ -73,13 +81,13 @@ start_services() {
 
 stop_services() {
     log_info "Stopping OpenMetadata services..."
-    docker-compose -f $COMPOSE_FILE down
+    docker-compose --env-file $ENV_FILE -f $COMPOSE_FILE down
     log_success "Services stopped successfully!"
 }
 
 restart_services() {
     log_info "Restarting OpenMetadata services..."
-    docker-compose -f $COMPOSE_FILE restart
+    docker-compose --env-file $ENV_FILE -f $COMPOSE_FILE restart
     log_success "Services restarted successfully!"
     echo ""
     sleep 5
@@ -88,7 +96,7 @@ restart_services() {
 
 show_status() {
     log_info "Service Status:"
-    docker-compose -f $COMPOSE_FILE ps
+    docker-compose --env-file $ENV_FILE -f $COMPOSE_FILE ps
 }
 
 health_check() {
@@ -97,7 +105,7 @@ health_check() {
     else
         log_warning "Health check script not found at ./scripts/health-check.sh"
         log_info "Checking basic container status..."
-        docker-compose -f $COMPOSE_FILE ps
+        docker-compose --env-file $ENV_FILE -f $COMPOSE_FILE ps
     fi
 }
 
@@ -105,10 +113,10 @@ show_logs() {
     local service=$1
     if [ -n "$service" ]; then
         log_info "Showing logs for $service..."
-        docker-compose -f $COMPOSE_FILE logs -f "$service"
+        docker-compose --env-file $ENV_FILE -f $COMPOSE_FILE logs -f "$service"
     else
         log_info "Showing logs for all services..."
-        docker-compose -f $COMPOSE_FILE logs -f
+        docker-compose --env-file $ENV_FILE -f $COMPOSE_FILE logs -f
     fi
 }
 
@@ -118,7 +126,7 @@ backup_database() {
     
     log_info "Creating database backup..."
     
-    if docker-compose -f $COMPOSE_FILE ps openmetadata_mysql | grep -q "Up"; then
+    if docker-compose --env-file $ENV_FILE -f $COMPOSE_FILE ps openmetadata_mysql | grep -q "Up"; then
         docker exec openmetadata_mysql mysqldump -u root -ppassword --all-databases > "$backup_file"
         log_success "Database backup created: $backup_file"
         
@@ -175,7 +183,7 @@ clean_everything() {
     
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         log_info "Stopping and removing all containers..."
-        docker-compose -f $COMPOSE_FILE down -v --remove-orphans
+        docker-compose --env-file $ENV_FILE -f $COMPOSE_FILE down -v --remove-orphans
         
         log_info "Removing unused Docker resources..."
         docker system prune -f
@@ -190,10 +198,10 @@ update_services() {
     log_info "Updating OpenMetadata services..."
     
     log_info "Pulling latest images..."
-    docker-compose -f $COMPOSE_FILE pull
+    docker-compose --env-file $ENV_FILE -f $COMPOSE_FILE pull
     
     log_info "Restarting services with new images..."
-    docker-compose -f $COMPOSE_FILE up -d
+    docker-compose --env-file $ENV_FILE -f $COMPOSE_FILE up -d
     
     log_success "Update completed!"
     echo ""
@@ -205,8 +213,8 @@ open_shell() {
     
     log_info "Opening shell in $service container..."
     
-    if docker-compose -f $COMPOSE_FILE ps "$service" | grep -q "Up"; then
-        docker-compose -f $COMPOSE_FILE exec "$service" /bin/bash
+    if docker-compose --env-file $ENV_FILE -f $COMPOSE_FILE ps "$service" | grep -q "Up"; then
+        docker-compose --env-file $ENV_FILE -f $COMPOSE_FILE exec "$service" /bin/bash
     else
         log_error "Service $service is not running"
         exit 1

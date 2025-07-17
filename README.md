@@ -21,14 +21,14 @@ A **secure, production-ready** OpenMetadata deployment with comprehensive securi
 ### Initial Setup
 ```bash
 # 1. Configure environment (REQUIRED)
-cp .env .env.backup  # Backup template
-nano .env            # Replace YOUR_*_HERE placeholders with real values
+cp .env .env.local   # Create local environment file
+nano .env.local      # Replace YOUR_*_HERE placeholders with real values
 
 # 2. Set secure permissions
-chmod 600 .env
+chmod 600 .env.local
 
 # 3. Validate configuration
-./scripts/validate-env.sh
+./scripts/validate-env.sh .env.local
 
 # 4. Run security audit
 ./scripts/manage.sh security
@@ -36,8 +36,8 @@ chmod 600 .env
 
 ### Start OpenMetadata
 ```bash
-# Start all services
-docker-compose up -d
+# Start all services with local environment
+docker-compose --env-file .env.local up -d
 
 # Check service health
 ./scripts/health-check.sh
@@ -58,15 +58,15 @@ docker-compose logs -f
 ./scripts/manage.sh start|stop|restart|health|logs|backup|restore|security
 
 # Environment & security validation
-./scripts/validate-env.sh          # Validate environment configuration
-./scripts/manage.sh security       # Run comprehensive security audit
+./scripts/validate-env.sh .env.local # Validate local environment configuration
+./scripts/manage.sh security         # Run comprehensive security audit
 
 # Service monitoring
-./scripts/health-check.sh          # Check service health status
+./scripts/health-check.sh            # Check service health status
 
-# Manual service control
-docker-compose up -d               # Start all services
-docker-compose down                # Stop all services
+# Manual service control with local environment
+docker-compose --env-file .env.local up -d    # Start all services
+docker-compose down                            # Stop all services
 ```
 
 ## 📁 Project Structure
