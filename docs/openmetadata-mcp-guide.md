@@ -1,56 +1,35 @@
-# OpenMetadata MCP (Model Context Protocol) - Comprehensive Guide
+# OpenMetadata MCP (Model Context Protocol) - Compact Guide
 
-A complete guide to setting up and using OpenMetadata's integrated MCP server with Claude Desktop, VS Code with GitHub Copilot, and other AI tools.
+Complete setup and usage guide for OpenMetadata's integrated MCP server with AI tools.
 
 ## 📖 Table of Contents
 
-1. [What is MCP?](#what-is-mcp)
-2. [OpenMetadata MCP Overview](#openmetadata-mcp-overview)
-3. [Supported Tools & Integrations](#supported-tools--integrations)
-4. [MCP Capabilities & Features](#mcp-capabilities--features)
-5. [Use Cases & Examples](#use-cases--examples)
-6. [OpenMetadata vs DataHub MCP](#openmetadata-vs-datahub-mcp)
-7. [Pros and Cons](#pros-and-cons)
-8. [Setup Guide](#setup-guide)
-9. [Troubleshooting](#troubleshooting)
-10. [Best Practices](#best-practices)
+1. [MCP Overview](#mcp-overview)
+2. [Tool Support & Integration](#tool-support--integration)
+3. [MCP Capabilities](#mcp-capabilities)
+4. [Use Cases](#use-cases)
+5. [OpenMetadata vs DataHub](#openmetadata-vs-datahub)
+6. [Setup Guide](#setup-guide)
+7. [Troubleshooting](#troubleshooting)
+8. [Best Practices](#best-practices)
 
 ---
 
-## What is MCP?
+## MCP Overview
 
-**Model Context Protocol (MCP)** is an open standard that enables AI models and tools to securely access and interact with external data sources and systems. It provides a standardized way for:
+**Model Context Protocol (MCP)** enables AI models to securely access external data sources. OpenMetadata v1.8.0+ includes a fully integrated MCP server.
 
-- **AI Models** (Claude, GPT, etc.) to connect to data platforms
-- **Tools** (VS Code, Claude Desktop, Cursor, etc.) to integrate with metadata systems
-- **Secure data access** with proper authentication and authorization
-- **Real-time data interaction** for enhanced AI capabilities
+### Key Benefits & Features
 
-### Key Benefits of MCP:
-- 🔐 **Secure Authentication** - Token-based access control
-- 🔄 **Real-time Integration** - Live data access, not static exports
-- 🛠️ **Tool Agnostic** - Works with multiple AI platforms and tools
-- 📊 **Rich Context** - Provides deep metadata context to AI models
-
----
-
-## OpenMetadata MCP Overview
-
-OpenMetadata v1.8.0+ includes a **fully integrated MCP server** that leverages OpenMetadata's unified metadata graph to provide AI models with rich context about your data ecosystem.
-
-### MCP Transport Methods
-
-OpenMetadata supports **two MCP transport protocols**:
-
-1. **SSE (Server-Sent Events)** - `http://localhost:8585/mcp/sse`
-   - Real-time streaming communication
-   - Best for most AI tools and integrations
-   - Recommended for Claude Desktop and VS Code
-
-2. **Streamable HTTP** - `http://localhost:8585/mcp`
-   - HTTP-based request/response
-   - Alternative for tools that don't support SSE
-   - Supports origin header validation for security
+| Aspect | Details |
+|--------|---------|
+| **Authentication** | 🔐 Token-based access control via OpenMetadata JWT/OAuth |
+| **Integration** | 🔄 Real-time live data access, not static exports |
+| **Compatibility** | 🛠️ Works with multiple AI platforms and tools |
+| **Context** | 📊 Rich metadata context from unified data graph |
+| **Transport** | SSE (`/mcp/sse`) + Streamable HTTP (`/mcp`) |
+| **Protocol** | JSON-RPC 2.0, MCP v2024-11-05 |
+| **Security** | Same auth engine as OpenMetadata UI, RBAC integration |
 
 ### Architecture
 
@@ -67,412 +46,108 @@ OpenMetadata supports **two MCP transport protocols**:
    & Commands               & Authorization         & Data Assets
 ```
 
-### Technical Implementation
+---
 
-**MCP Server Components:**
-- **MCPStreamableHttpServlet** - Handles HTTP-based MCP communication (`/mcp`)
-- **HttpServletSseServerTransportProvider** - Manages SSE transport (`/mcp/sse`) 
-- **DefaultToolContext** - Executes MCP tool calls with proper authorization
-- **McpAuthFilter** - Handles authentication and JWT token validation
-- **MCPConfiguration** - Manages server settings and origin validation
+## Tool Support & Integration
 
-**Protocol Support:**
-- **JSON-RPC 2.0** - Standard messaging protocol
-- **MCP Protocol Version** - `2024-11-05` (latest specification)
-- **Server Capabilities** - Tools, prompts, and resources support
-- **Session Management** - Persistent sessions with unique session IDs
+### Comprehensive Tool Support Matrix
 
-**Security Architecture:**
-- **Same Auth Engine** - Uses OpenMetadata's existing JWT/OAuth system
-- **RBAC Integration** - Respects user roles and permissions
-- **Token Validation** - All requests validated through JwtFilter
-- **Origin Validation** - Optional CORS protection for Streamable HTTP
+| Tool | Status | Support Level | Key Features | Configuration | VS Code Features | Setup Method |
+|------|--------|---------------|--------------|---------------|------------------|--------------|
+| **Claude Desktop** | ✅ Full | Official | Complete metadata access, search, lineage | `claude_desktop_config.json` | N/A | Direct MCP server connection |
+| **VS Code + GitHub Copilot** | ✅ Full | Official | Agent mode, tools, resources, prompts | `.vscode/mcp.json` | Agent mode, tool selection (128 limit), MCP resources, prompts (`/mcp.openmetadata.promptname`), settings sync, auto-discovery | Native MCP protocol (v1.102+) |
+| **Goose Desktop** | 🔄 Experimental | Community | Basic metadata access | Custom config | N/A | Community-maintained |
 
-### Key Features:
-- ✅ **Embedded MCP Server** - Built directly into OpenMetadata
-- ✅ **Same Authorization Engine** - Uses OpenMetadata's existing security model
-- ✅ **Complete Metadata Access** - Full access to your data catalog
-- ✅ **Real-time Updates** - Live data and lineage information
-- ✅ **Role-based Access** - Respects user permissions and policies
+### Configuration Types & Use Cases
+
+| Configuration Type | File/Location | Primary Use Case | Best For | Setup Complexity |
+|-------------------|---------------|------------------|----------|------------------|
+| **Workspace Config** | `.vscode/mcp.json` | Team sharing, project-specific | Development teams, shared projects | ⭐⭐ Medium |
+| **User Config** | Global VS Code settings | Personal setup, cross-project | Individual developers | ⭐ Easy |
+| **Auto-discovery** | Automatic detection | Import from other tools | Multi-tool users | ⭐ Easy |
 
 ---
 
-## Supported Tools & Integrations
+## MCP Capabilities
 
-### ✅ Officially Supported
+## MCP Capabilities
 
-| Tool | Status | Features | Configuration |
-|------|--------|----------|---------------|
-| **Claude Desktop** | ✅ Full Support | Complete metadata access, search, lineage | `claude_desktop_config.json` |
-| **VS Code + GitHub Copilot** | ✅ Full Support | Agent mode, tools, resources, prompts | `.vscode/mcp.json` |
-| **Cursor IDE** | ✅ Full Support | AI-powered code assistance | MCP server config |
-| **OpenAI GPT** | ✅ Compatible | API-based integration | REST API |
+### OpenMetadata MCP Tools & Capabilities Matrix
 
-### 🛠️ VS Code Integration Details
+| Tool Name | Function | Category | Primary Use | Parameters | Example Usage | Specific Capabilities | Discovery Method |
+|-----------|----------|----------|-------------|------------|---------------|----------------------|------------------|
+| `search_metadata` | 🔍 Search & Discovery | Data Discovery | Find entities across catalog | `query`, `entity_type`, `limit` | "Search for all tables containing customer data" | Find entities by keywords, filter by type, set result limits, search across tables/databases/dashboards/pipelines | VS Code Agent Mode, Claude chat |
+| `get_entity_details` | 📊 Entity Information | Metadata Analysis | Get detailed entity data | `entity_type`, `fqn` | "Get details about the sales database" | Retrieve comprehensive entity information by FQN, get complete metadata context | Direct tool reference |
+| `get_entity_lineage` | 🔗 Lineage Analysis | Dependencies | Trace data dependencies | `entity_type`, `fqn`, `upstream_depth`, `downstream_depth` | "Show me the lineage for table 'user_profiles'" | Trace data lineage with upstream/downstream depth control, column-level lineage tracking | Impact analysis queries |
+| `create_glossary` | 📝 Governance Setup | Documentation | Create business glossaries | `name`, `description`, `mutuallyExclusive`, `owners`, `reviewers` | "Create a glossary for financial terms" | Set up business glossaries with ownership settings, configure mutual exclusivity | Governance workflows |
+| `create_glossary_term` | 📝 Documentation | Documentation | Add glossary terms | `glossary`, `name`, `description`, `parentTerm`, `owners` | "Add a new term 'Customer Lifetime Value'" | Add terms to glossaries with hierarchical relationships, support parent-child structures | Business context creation |
+| `patch_entity` | ⚙️ Entity Management | Operations | Update entity metadata | `entityType`, `entityFqn`, `patch` | "Update the description of the users table" | Modify entity properties using JSONPatch operations, fine-grained metadata updates | Administrative tasks |
 
-**MCP Support Features in VS Code:**
-- ✅ **Agent Mode** - AI assistant with tool access
-- ✅ **Tool Selection** - Enable/disable specific MCP tools
-- ✅ **MCP Resources** - Add data context to prompts
-- ✅ **MCP Prompts** - Predefined prompt templates
-- ✅ **Settings Sync** - Synchronize MCP configs across devices
-- ✅ **Dev Container Support** - MCP in containerized environments
-- ✅ **Auto-discovery** - Detect MCP servers from other tools
+### Tool Discovery & Access Methods
 
-**Configuration Options:**
-- 📁 **Workspace Config** - `.vscode/mcp.json` (team sharing)
-- 👤 **User Config** - Global settings (personal)
-- 🐳 **Dev Container** - `devcontainer.json` integration
-- 🔍 **Auto-discovery** - Import from Claude Desktop configs
-
-### 🔄 Community Supported
-
-| Tool | Status | Notes |
-|------|--------|-------|
-| **Goose Desktop** | 🔄 Experimental | Community-maintained |
-| **Continue.dev** | 🔄 In Progress | VS Code extension |
-| **Cody** | 🔄 Planned | Sourcegraph integration |
-
-### 🛠️ Integration Methods
-
-1. **Desktop Applications** - Direct MCP server connection
-2. **VS Code Extensions** - Through native MCP protocol (v1.102+)
-3. **Dev Containers** - MCP configuration in `devcontainer.json`
-4. **API Integration** - REST API with MCP compatibility
-5. **Custom Tools** - Using MCP SDK/libraries
-6. **Auto-discovery** - Automatic detection from other MCP tools
+| Platform | Method | Steps | Command Examples |
+|----------|--------|-------|------------------|
+| **VS Code** | Agent Mode | Chat view (`Ctrl+Cmd+I`) → Agent mode → Tools button → Look for OpenMetadata tools | `MCP: Browse Resources`, `MCP: List Servers`, `MCP: Show Installed Servers` |
+| **Claude Desktop** | Direct Query | Ask AI about available tools | "What tools do you have available from OpenMetadata?" |
+| **Terminal** | Direct Testing | Command line MCP testing | `npx -y mcp-remote http://localhost:8585/mcp/sse --header "Authorization:Bearer TOKEN" --verbose` |
+| **All Platforms** | Tool Categories | Expected operational categories | 🔍 Search & Discovery, 📊 Lineage Analysis, 📈 Data Quality, 👥 Governance, 📝 Documentation, 🔄 Operations |
 
 ---
 
-## MCP Capabilities & Features
+## Use Cases
 
-### 🛠️ Available OpenMetadata MCP Tools
+### Comprehensive Use Case Matrix
 
----
+| Use Case Category | Scenario | User Query | AI Response Summary | Tools Used | Business Impact | Example Implementation |
+|-------------------|----------|------------|-------------------|------------|-----------------|----------------------|
+| **🔄 Pipeline Monitoring** | Operational monitoring | "Monitor our data pipelines and alert me about any failures" | Lists 3 pipelines: ✅ Customer ETL (running), ⚠️ Sales Sync (warning), ❌ ML Pipeline (failed) | `search_metadata`, `get_entity_details` | Proactive issue detection, reduced downtime | Real-time pipeline status dashboard |
+| **📊 Dashboard Generation** | Data quality visualization | "Create a dashboard showing our data quality metrics" | Proposes dashboard with completeness scores, freshness trends, validation results, top 10 quality issues | `search_metadata`, `get_entity_details` | Improved data trust, faster issue resolution | Automated quality reporting |
+| **🔒 GDPR Compliance** | Regulatory compliance | "I need to find all customer-related data for GDPR compliance" | Identifies 23 tables: 🔴 High risk (PII), 🟡 Medium risk, with compliance tags and detailed breakdown | `search_metadata`, `get_entity_lineage` | Risk mitigation, compliance automation | Privacy impact assessments |
+| **⚡ Impact Analysis** | Change management | "What would break if I modify the user_id column in the users table?" | Shows 5 direct impacts (FK constraints), 12 downstream dashboards affected with migration plan recommendation | `get_entity_lineage`, `get_entity_details` | Reduced deployment risks, change planning | Database schema evolution |
+| **🔍 Data Discovery** | Data exploration | "Find all tables containing customer data" | Comprehensive catalog search with filtering, tagging, and metadata context | `search_metadata` | Faster data onboarding, improved productivity | Self-service analytics |
+| **📝 Governance Setup** | Business context creation | "Create a glossary for financial terms and add key definitions" | Creates structured glossary with hierarchical terms, ownership, and business context | `create_glossary`, `create_glossary_term` | Better data understanding, standardized definitions | Business vocabulary management |
+| **🔧 Metadata Management** | Administrative tasks | "Update descriptions and tags for all customer-related tables" | Bulk metadata updates with validation and change tracking | `patch_entity`, `search_metadata` | Improved data documentation, consistency | Metadata maintenance automation |
+| **📈 Quality Analysis** | Data health assessment | "Show me data quality trends and ownership gaps" | Comprehensive quality metrics, ownership analysis, and actionable recommendations | `search_metadata`, `get_entity_details` | Proactive quality management, ownership clarity | Data stewardship programs |
 
-## MCP Capabilities & Features
+### Detailed Implementation Examples
 
-### 🛠️ Available OpenMetadata MCP Tools
-
-OpenMetadata's MCP server currently provides **6 core tools** for interacting with your metadata catalog.
-
-#### **🔢 Current Tool Count: 6 Tools**
-
-Your OpenMetadata MCP server exposes **6 tools** that provide essential metadata management capabilities. Here are the exact tools available:
-
-| Tool Name | Description | Primary Function | Parameters |
-|-----------|-------------|------------------|------------|
-| `search_metadata` | Search across all metadata entities (tables, databases, dashboards, pipelines, etc.) | 🔍 **Search & Discovery** | `query`, `entity_type`, `limit` |
-| `get_entity_details` | Get detailed information about specific entities by entity type and FQN | 📊 **Entity Details** | `entity_type`, `fqn` |
-| `get_entity_lineage` | Get upstream and downstream lineage for entities with configurable depth | 🔗 **Lineage Analysis** | `entity_type`, `fqn`, `upstream_depth`, `downstream_depth` |
-| `create_glossary` | Create new business glossaries with descriptions, ownership, and mutual exclusivity settings | 📝 **Governance Setup** | `name`, `description`, `mutuallyExclusive`, `owners`, `reviewers` |
-| `create_glossary_term` | Create glossary terms within existing glossaries, supporting hierarchical relationships | 📝 **Documentation** | `glossary`, `name`, `description`, `parentTerm`, `owners` |
-| `patch_entity` | Update/patch entity metadata using JSONPatch format for fine-grained modifications | ⚙️ **Entity Management** | `entityType`, `entityFqn`, `patch` |
-
-#### **🛠️ Tool Implementation Details**
-
-**Authentication & Authorization:**
-- All tools require proper authentication via OpenMetadata Personal Access Token
-- Tools respect OpenMetadata's role-based access control (RBAC)
-- Authorization is handled through the same engine as the OpenMetadata UI
-
-**Tool Execution Context:**
-- Tools are executed within `DefaultToolContext` class
-- Each tool call includes proper security context and user permissions
-- Rate limiting and resource controls are applied via OpenMetadata's `Limits` framework
-
-**Tool Definition:**
-- Tools are defined in `json/data/mcp/tools.json` within the OpenMetadata server
-- Each tool specifies its parameters schema using JSON Schema format
-- Tool implementations are loaded at server startup via `McpUtils.getToolProperties()`
-
-#### **📝 MCP Prompts Support**
-
-In addition to tools, OpenMetadata's MCP server also supports **prompts** for enhanced AI interactions:
-
-**Prompt Features:**
-- **Predefined Templates** - Ready-to-use prompts for common metadata tasks
-- **Parameterized Prompts** - Dynamic prompts that accept arguments
-- **Context-aware** - Prompts that leverage OpenMetadata's metadata context
-
-**Prompt Definition:**
-- Prompts are defined in `json/data/mcp/prompts.json` 
-- Loaded via `DefaultPromptsContext.loadPromptsDefinitionsFromJson()`
-- Accessible through MCP protocol's `prompts/get` and `prompts/list` methods
-
-**Usage in VS Code:**
-- Use `/mcp.openmetadata.promptname` syntax to invoke prompts
-- Available in agent mode and MCP resources
-- Prompts can be combined with tools for complex workflows
-
-#### **👁️ How to View Your Specific 6 Tools**
-
-**In VS Code Agent Mode:**
-1. Open Chat view (`Ctrl+Cmd+I` on Mac, `Ctrl+Alt+I` on Windows/Linux)
-2. Select **Agent mode** from the dropdown
-3. Click **Tools** button to see all available MCP tools
-4. Enable the specific OpenMetadata tools you need (all 6 or a subset)
-5. Use natural language to interact with your metadata catalog
-
-**Example Queries with Actual Tools:**
-```
-"Search for all tables containing customer data" (uses search_metadata)
-"Show me the lineage for table 'user_profiles'" (uses get_entity_lineage)
-"Get details about the sales database" (uses get_entity_details)
-"Create a glossary for financial terms" (uses create_glossary)
-"Add a new term 'Customer Lifetime Value'" (uses create_glossary_term)
-"Update the description of the users table" (uses patch_entity)
-```
-
-**Tool Capabilities Summary:**
-- `search_metadata` - Find entities by keywords, filter by type, set result limits
-- `get_entity_details` - Retrieve comprehensive entity information by FQN
-- `get_entity_lineage` - Trace data lineage with upstream/downstream depth control
-- `create_glossary` - Set up business glossaries with ownership settings
-- `create_glossary_term` - Add terms to glossaries with hierarchical relationships
-- `patch_entity` - Modify entity properties using JSONPatch operations
-
-> **Note**: These are the actual 6 tools available in your running OpenMetadata MCP server (confirmed working).
-
-### 🔍 Discovering Available OpenMetadata MCP Tools
-
-OpenMetadata's MCP server provides tools for interacting with your metadata catalog. The exact tools available depend on your OpenMetadata version and configuration.
-
-#### **How to Find Available Tools**
-
-1. **In VS Code Agent Mode:**
-   - Open Chat view (`Ctrl+Cmd+I` on Mac, `Ctrl+Alt+I` on Windows/Linux)
-   - Select **Agent mode** from the dropdown
-   - Click **Tools** button to see all available MCP tools
-   - Look for tools prefixed with your OpenMetadata server name
-
-2. **Using VS Code Commands:**
-   ```bash
-   # Command Palette options:
-   MCP: Browse Resources
-   MCP: List Servers
-   MCP: Show Installed Servers
-   ```
-
-3. **In Claude Desktop:**
-   - After successful MCP connection, ask: "What tools do you have available from OpenMetadata?"
-   - The AI will list the actual tools provided by your OpenMetadata MCP server
-
-4. **Direct MCP Server Testing:**
-   ```bash
-   # Test connection and see available capabilities
-   npx -y mcp-remote http://localhost:8585/mcp/sse 
-     --auth-server-url=http://localhost:8585/mcp 
-     --client-id=openmetadata 
-     --header "Authorization:Bearer YOUR_TOKEN" 
-     --verbose
-   ```
-
-#### **Expected Tool Categories**
-
-Based on OpenMetadata's architecture, the MCP server typically provides tools for:
-
-- **🔍 Search & Discovery** - Finding and exploring metadata entities
-- **📊 Lineage Analysis** - Understanding data flow and dependencies  
-- **📈 Data Quality** - Accessing quality metrics and test results
-- **👥 Governance** - Managing ownership, tags, and compliance
-- **📝 Documentation** - Working with descriptions and glossary terms
-- **🔄 Operations** - Pipeline status and usage analytics
-
-#### **Tool Usage Notes**
-
-- **Tool Names**: Actual tool names depend on OpenMetadata's MCP implementation
-- **Capabilities**: Each tool's functionality is defined by OpenMetadata's API
-- **Permissions**: Tool availability depends on your user permissions in OpenMetadata
-- **Version**: Available tools may vary between OpenMetadata versions
-
-### 📖 **Tool Discovery Best Practices**
-
-1. **Start with Discovery**: Always check what tools are actually available first
-2. **Test Gradually**: Try simple operations before complex workflows
-3. **Check Permissions**: Ensure your OpenMetadata user has necessary access
-4. **Monitor Logs**: Use MCP server output to debug tool issues
-
-### 🔍 Data Discovery & Search
-
-```python
-# Example MCP interactions
-"Find all tables related to customer data"
-"Show me the lineage for table 'user_profiles'"  
-"What are the most recent changes to our data warehouse?"
-```
-
-**Available Operations:**
-- Search tables, databases, dashboards, pipelines
-- Filter by tags, owners, domains
-- Advanced metadata queries
-- Column-level search and discovery
-
-### 📊 Metadata Analysis
-
-```python
-# Metadata insights
-"Analyze data quality metrics for our sales tables"
-"Show ownership gaps in our data assets"
-"Generate a summary of our data governance status"
-```
-
-**Capabilities:**
-- Data quality assessment
-- Ownership analysis
-- Usage statistics
-- Governance compliance checks
-
-### 🔄 Lineage & Dependencies
-
-```python
-# Lineage exploration
-"Show me the upstream dependencies of table X"
-"What would be impacted if I change column Y?"
-"Trace data flow from source to dashboard"
-```
-
-**Features:**
-- Column-level lineage tracking
-- Impact analysis
-- Root cause analysis
-- Dependency mapping
-
-### 📝 Documentation & Glossary
-
-```python
-# Documentation assistance
-"Create glossary terms for our financial data"
-"Generate documentation for table schemas"
-"Add business context to data assets"
-```
-
-**Operations:**
-- Auto-generate documentation
-- Create and manage glossary terms
-- Add tags and classifications
-- Business context enrichment
-
-### 🎛️ Data Governance
-
-```python
-# Governance operations
-"Check compliance status of PII data"
-"Apply data classification tags"
-"Review access policies for sensitive tables"
-```
-
-**Governance Features:**
-- Policy management
-- Access control reviews
-- Compliance monitoring
-- Risk assessment
+| Use Case | Complete Interaction Flow | Technical Details |
+|----------|---------------------------|-------------------|
+| **Pipeline Monitoring** | User: "Monitor our data pipelines" → AI: Scans pipeline entities → Returns status with health indicators → Offers investigation options for failures | Uses `search_metadata` with entity_type='pipeline', then `get_entity_details` for status information |
+| **GDPR Compliance** | User: "Find customer data for GDPR" → AI: Searches for PII-tagged entities → Analyzes data sensitivity → Categorizes by risk level → Generates compliance report | Combines `search_metadata` for PII discovery with `get_entity_lineage` for data flow analysis |
+| **Impact Analysis** | User: "What breaks if I modify user_id?" → AI: Traces column dependencies → Maps downstream impacts → Identifies affected dashboards → Suggests migration strategy | Uses `get_entity_lineage` with column-level granularity, upstream_depth=3, downstream_depth=5 |
+| **Dashboard Generation** | User: "Create quality dashboard" → AI: Discovers quality metrics → Aggregates completeness scores → Identifies trends → Proposes visualization config | Leverages `search_metadata` for quality entities and `get_entity_details` for metric extraction |
 
 ---
 
-## Use Cases & Examples
-
-### 1. **Intelligent Pipeline Monitoring**
-
-```python
-User: "Monitor our data pipelines and alert me about any failures"
-
-AI Response: "I can see 3 active pipelines in OpenMetadata:
-- Customer ETL Pipeline: ✅ Running (Last success: 2 hours ago)
-- Sales Data Sync: ⚠️ Warning (High memory usage)
-- ML Feature Pipeline: ❌ Failed (Error in transform step)
-
-Would you like me to investigate the failed pipeline?"
-```
-
-### 2. **Automated Dashboard Generation**
-
-```python
-User: "Create a dashboard showing our data quality metrics"
-
-AI Response: "Based on your OpenMetadata data quality tests, I'll create a dashboard with:
-- Table completeness scores across all databases
-- Data freshness trends for critical tables  
-- Schema validation results
-- Top 10 tables with quality issues
-
-Shall I generate the dashboard configuration?"
-```
-
-### 3. **Data Discovery & Exploration**
-
-```python
-User: "I need to find all customer-related data for GDPR compliance"
-
-AI Response: "Found 23 tables containing customer data:
-
-🔴 High Risk (PII):
-- users.customer_profiles (SSN, email, phone) - Tagged: PII, GDPR_CRITICAL
-- payments.billing_info (credit card data) - Tagged: PCI_DSS, SENSITIVE
-
-🟡 Medium Risk:
-- analytics.user_behavior (user IDs, IP addresses) - Tagged: ANALYTICS, PII_INDIRECT  
-- marketing.campaigns (email preferences) - Tagged: MARKETING, GDPR
-
-Would you like me to generate a GDPR compliance report?"
-```
-
-### 4. **Impact Analysis**
-
-```python
-User: "What would break if I modify the user_id column in the users table?"
-
-AI Response: "⚠️ CRITICAL IMPACT DETECTED:
-
-Direct Impact (5 tables):
-- orders.user_orders (FK constraint)
-- analytics.user_sessions (joins)
-- recommendations.user_prefs (references)
-
-Downstream Impact (12 dashboards):
-- Sales Performance Dashboard
-- User Analytics Dashboard  
-- Recommendation Engine Metrics
-
-I recommend creating a migration plan. Shall I draft one?"
-```
-
----
-
-## OpenMetadata vs DataHub MCP
+## OpenMetadata vs DataHub
 
 ### Feature Comparison
 
 | Feature | OpenMetadata MCP | DataHub MCP |
 |---------|------------------|-------------|
 | **MCP Server** | ✅ Built-in (v1.8.0+) | ✅ External ([mcp-server-datahub](https://github.com/acryldata/mcp-server-datahub)) |
-| **Authentication** | ✅ Integrated OAuth/JWT | ✅ API Token-based |
-| **Real-time Updates** | ✅ SSE (Server-Sent Events) | ✅ REST API polling |
+| **Architecture** | Embedded in core | Separate project |
+| **Authentication** | Integrated OAuth/JWT | API Token-based |
+| **Transport** | SSE + Streamable HTTP | REST API |
+| **Real-time Updates** | ✅ Native streaming | ✅ Polling-based |
 | **Column-level Lineage** | ✅ Native support | ✅ Available |
 | **Data Quality Integration** | ✅ Built-in quality framework | ✅ External quality tools |
 | **Glossary Management** | ✅ Rich business glossary | ✅ Business glossary |
 | **Auto-classification** | ✅ ML-powered tagging | ✅ Policy-based tagging |
 | **Change Management** | ✅ Version control integration | ✅ Change tracking |
+| **Maturity** | 🟡 New (v1.8.0+) | 🟡 Community project |
+| **Setup Complexity** | ✅ Simple (all-in-one) | 🔄 Complex (multiple components) |
 
-### Architecture Differences
+### Architecture Comparison
 
-#### OpenMetadata MCP
-```
-✅ Embedded Architecture
-- MCP server built into OpenMetadata core
-- Same authentication & authorization engine
-- Direct access to metadata graph
-- Real-time streaming via SSE
-```
-
-#### DataHub MCP  
-```
-✅ External Server Architecture
-- Separate mcp-server-datahub project
-- API-based communication
-- Independent deployment
-- REST API integration
-```
+| Aspect | OpenMetadata MCP | DataHub MCP |
+|--------|------------------|-------------|
+| **Integration Type** | ✅ Embedded Architecture | ✅ External Server Architecture |
+| **Server Location** | MCP server built into OpenMetadata core | Separate mcp-server-datahub project |
+| **Auth Engine** | Same authentication & authorization engine | API-based communication |
+| **Data Access** | Direct access to metadata graph | Independent deployment |
+| **Communication** | Real-time streaming via SSE | REST API integration |
 
 ### Maturity & Ecosystem
 
@@ -484,65 +159,23 @@ I recommend creating a migration plan. Shall I draft one?"
 | **Enterprise Features** | ✅ Built-in enterprise features | ✅ Commercial support available |
 | **Ecosystem Size** | 🔄 Growing (~7.1k stars) | ✅ Mature (~10.8k stars) |
 
-### When to Choose OpenMetadata MCP
+### When to Choose
 
-✅ **Choose OpenMetadata if:**
-- You want a unified, all-in-one metadata platform
-- You need built-in data quality and governance features
-- You prefer embedded MCP with tight integration
-- You want modern UI/UX and active development
-- You need strong collaboration features
+| Choose OpenMetadata MCP If | Choose DataHub MCP If |
+|---------------------------|----------------------|
+| ✅ Want unified, all-in-one metadata platform | ✅ Need maximum flexibility and customization |
+| ✅ Prefer embedded MCP with tight integration | ✅ Have existing DataHub investments |
+| ✅ Need modern UI/UX and active development | ✅ Want battle-tested enterprise solution |
+| ✅ Want built-in data quality and governance | ✅ Need extensive connector ecosystem |
+| ✅ Prefer simple setup and maintenance | ✅ Want LinkedIn's production-grade architecture |
+| ✅ Need strong collaboration features | ✅ Require complex data modeling capabilities |
 
-### When to Choose DataHub MCP
+### Pros & Cons Summary
 
-✅ **Choose DataHub if:**
-- You need maximum flexibility and customization
-- You have existing DataHub investments
-- You prefer battle-tested, enterprise-proven solutions
-- You need extensive connector ecosystem
-- You want LinkedIn's production-grade architecture
-
----
-
-## Pros and Cons
-
-### OpenMetadata MCP
-
-#### ✅ Pros
-- **Unified Platform** - Everything in one place (catalog, quality, governance)
-- **Built-in Integration** - No separate MCP server to maintain
-- **Modern Architecture** - Real-time updates via SSE
-- **Rich UI/UX** - Intuitive web interface
-- **Active Development** - Frequent releases and new features
-- **Strong Community** - Growing ecosystem and support
-- **Comprehensive Features** - Data quality, observability, governance built-in
-- **Easy Setup** - Simple installation and configuration
-
-#### ❌ Cons
-- **Newer Platform** - Less battle-tested than DataHub
-- **Smaller Ecosystem** - Fewer third-party integrations
-- **MCP Recent Addition** - MCP support is relatively new (v1.8.0+)
-- **Learning Curve** - Different concepts from traditional catalogs
-- **Resource Requirements** - Can be resource-intensive for large deployments
-
-### DataHub MCP
-
-#### ✅ Pros
-- **Battle-tested** - Proven at LinkedIn scale
-- **Mature Ecosystem** - Extensive connectors and integrations
-- **Flexible Architecture** - Highly customizable and extensible
-- **Large Community** - Established user base and contributors
-- **Enterprise Ready** - Production-proven at many companies
-- **Rich Metadata Model** - Comprehensive data modeling
-- **Strong Documentation** - Extensive guides and examples
-
-#### ❌ Cons
-- **Complex Setup** - More moving parts and configuration
-- **External MCP Server** - Additional component to deploy and maintain
-- **UI/UX Aging** - Interface feels dated compared to modern tools
-- **Development Pace** - Slower release cycle
-- **Java/Python Mix** - Multiple technology stacks to manage
-- **Resource Heavy** - Can be complex for smaller organizations
+| Platform | Pros | Cons |
+|----------|------|------|
+| **OpenMetadata** | Unified platform, built-in integration, modern UI, easy setup | Newer platform, smaller ecosystem, recent MCP addition |
+| **DataHub** | Battle-tested, mature ecosystem, flexible architecture, large community | Complex setup, external MCP server, aging UI, resource heavy |
 
 ---
 
@@ -550,473 +183,187 @@ I recommend creating a migration plan. Shall I draft one?"
 
 ### Prerequisites
 
-- **OpenMetadata v1.8.0+** - [Upgrade guide](https://docs.open-metadata.org/latest/deployment/upgrade)
-- **AI Tool of Choice**:
-  - [Claude Desktop](https://claude.ai/download)
-  - VS Code with GitHub Copilot
-  - Cursor IDE
-  - Any MCP-compatible tool
+| Requirement | Details |
+|-------------|---------|
+| **OpenMetadata** | v1.8.0+ (MCP support) |
+| **AI Tools** | Claude Desktop, VS Code + Copilot, Cursor IDE |
+| **Access** | Admin rights to install MCP Application |
 
-### Step 1: Enable MCP in OpenMetadata
+### Quick Setup Steps
 
-1. Navigate to your OpenMetadata instance: `http://localhost:8585`
-2. Go to **Settings → Apps → MCP Application**
-3. Click **Install** to enable the MCP server
-4. Configure the MCP settings:
-   - **Origin Validation Enabled**: Set to `false` for SSE transport or `true` for enhanced security
-   - **Origin Header URI**: Required if validation is enabled (e.g., `https://yourapp.example.com`)
-   - Submit the configuration
+| Step | Action | Details |
+|------|--------|---------|
+| **1. Enable MCP** | Settings → Apps → MCP Application → Install | Configure origin validation if needed |
+| **2. Create Token** | `/users/admin/access-token` → Generate New Token | Copy securely, set 60-day expiration |
+| **3. Configure Tools** | Add MCP server config to AI tools | See platform-specific configs below |
+| **4. Test Connection** | Run test queries in AI tool | Verify tools are available |
 
-### Step 2: Create Personal Access Token
+### Platform Configurations
 
-1. Go to `http://localhost:8585/users/admin/access-token`
-2. Click **Generate New Token**
-3. Set expiration (recommended: 60 days)
-4. Copy the token securely
-
-### Step 3: Configure AI Tools
-
-#### For Claude Desktop
-
-Create/edit `claude_desktop_config.json`:
+#### Claude Desktop (`claude_desktop_config.json`)
 
 ```json
 {
   "mcpServers": {
     "openmetadata": {
       "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote",
-        "http://localhost:8585/mcp/sse",
-        "--auth-server-url=http://localhost:8585/mcp",
-        "--client-id=openmetadata",
-        "--verbose",
-        "--clean",
-        "--header",
-        "Authorization:${AUTH_HEADER}"
-      ],
-      "env": {
-        "AUTH_HEADER": "Bearer YOUR_OPENMETADATA_PAT_TOKEN"
-      }
+      "args": ["-y", "mcp-remote", "http://localhost:8585/mcp/sse",
+               "--auth-server-url=http://localhost:8585/mcp",
+               "--client-id=openmetadata", "--verbose", "--clean",
+               "--header", "Authorization:${AUTH_HEADER}"],
+      "env": { "AUTH_HEADER": "Bearer YOUR_OPENMETADATA_PAT_TOKEN" }
     }
   }
 }
 ```
 
-#### For VS Code with GitHub Copilot
+#### VS Code (`.vscode/mcp.json` or User Config)
 
-**Prerequisites:**
-- VS Code v1.102+ (MCP support is generally available)
-- GitHub Copilot extension enabled
-- Access to Copilot in VS Code
-
-**Configuration Options:**
-
-1.**User Configuration (Personal Setup)**
-
-   Run `MCP: Open User Configuration` command and add:
-
-   ```json
-   {
-     "servers": {
-       "OpenMetadata": {
-         "type": "stdio", 
-         "command": "npx",
-         "args": [
-           "-y",
-           "mcp-remote", 
-           "http://localhost:8585/mcp/sse",
-           "--auth-server-url=http://localhost:8585/mcp",
-           "--client-id=openmetadata"
-         ],
-         "env": {
-           "AUTH_HEADER": "Bearer YOUR_OPENMETADATA_PAT_TOKEN"
-         }
-       }
-     }
-   }
-   ```
-
-2. **Alternative: Add via Command Palette**
-   - Run `MCP: Add Server` command
-   - Choose `stdio` type
-   - Fill in server details
-   - Select Workspace or Global configuration
-
-#### For Cursor IDE
-
-Similar configuration in Cursor's settings with MCP server definition.
-
-### Step 4: Use MCP in VS Code
-
-1. **Enable Agent Mode**
-   - Open Chat view (`Ctrl+Cmd+I` on Mac, `Ctrl+Alt+I` on Windows/Linux)
-   - Select **Agent mode** from the dropdown
-   - Click **Tools** button to see available MCP tools
-
-2. **Select OpenMetadata Tools**
-   - In the tools picker, find OpenMetadata tools
-   - Enable/disable specific tools as needed
-   - Maximum 128 tools can be active per chat request
-
-3. **Start Using MCP**
-   ```
-   # Example prompts:
-   "What tables do you have access to in OpenMetadata?"
-   "Show me the lineage for table 'user_profiles'"
-   "Find all tables with customer data for GDPR compliance"
-   ```
-
-4. **Direct Tool Reference**
-   - Type `#` followed by tool name to reference directly
-   - Works in all chat modes (ask, edit, agent)
-
-5. **MCP Resources**
-   - Use **Add Context > MCP Resources** to add data context
-   - Browse available resources with `MCP: Browse Resources` command
-
-6. **MCP Prompts**
-   - Use `/mcp.openmetadata.promptname` for predefined prompts
-   - Available prompts depend on OpenMetadata MCP server capabilities
-
-### Step 5: Advanced VS Code MCP Features
-
-#### **MCP Server Management**
-- **View Servers**: `MCP: Show Installed Servers` in Extensions view
-- **Server Actions**: Right-click servers to start/stop/restart/configure
-- **Output Logs**: `MCP: Show Output` for debugging
-- **Browse Resources**: `MCP: Browse Resources` to explore available data
-
-#### **Settings Sync**
-- Enable Settings Sync to synchronize MCP configs across devices
-- Run `Settings Sync: Configure` and include "MCP Servers"
-- Maintain consistent development environment across machines
-
-#### **Dev Container Integration**
-Add to your `devcontainer.json`:
 ```json
 {
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:latest",
-  "customizations": {
-    "vscode": {
-      "mcp": {
-        "servers": {
-          "OpenMetadata": {
-            "type": "stdio",
-            "command": "npx",
-            "args": ["-y", "mcp-remote", "http://host.docker.internal:8585/mcp/sse"],
-            "env": {
-              "AUTH_HEADER": "Bearer ${localEnv:OPENMETADATA_TOKEN}"
-            }
-          }
-        }
-      }
+  "servers": {
+    "OpenMetadata": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "http://localhost:8585/mcp/sse",
+               "--auth-server-url=http://localhost:8585/mcp",
+               "--client-id=openmetadata"],
+      "env": { "AUTH_HEADER": "Bearer YOUR_OPENMETADATA_PAT_TOKEN" }
     }
   }
 }
 ```
 
-#### **Auto-discovery**
-Enable automatic detection of MCP servers:
+#### Alternative VS Code Setup Methods
+
+| Method | Steps |
+|--------|-------|
+| **Command Palette** | Run `MCP: Add Server` → Choose `stdio` type → Fill server details → Select Workspace/Global |
+| **User Configuration** | Run `MCP: Open User Configuration` → Add server config → Personal setup |
+| **Auto-discovery** | Enable auto-discovery to import from Claude Desktop configs |
+
+### Advanced VS Code Features
+
+| Feature | Description | Usage |
+|---------|-------------|-------|
+| **MCP Server Management** | View, start, stop, restart servers | `MCP: Show Installed Servers` in Extensions view |
+| **Server Actions** | Right-click server management | Right-click servers for start/stop/restart/configure |
+| **Output Logs** | Debug MCP server issues | `MCP: Show Output` for debugging |
+| **Browse Resources** | Explore available data | `MCP: Browse Resources` to explore data |
+| **Settings Sync** | Sync configs across devices | Enable Settings Sync → Include "MCP Servers" |
+
+#### Auto-discovery Configuration
+
 ```json
 {
   "chat.mcp.discovery.enabled": true
 }
 ```
-This will detect OpenMetadata MCP configs from Claude Desktop and other tools.
+
+### VS Code Usage
+
+| Action | Steps |
+|--------|-------|
+| **Enable Agent Mode** | Chat view (`Ctrl+Cmd+I`) → Agent mode → Tools button |
+| **Select Tools** | Tools picker → Enable OpenMetadata tools (max 128) |
+| **Use MCP** | Natural language queries: "What tables do you have?" |
+| **Direct Tool Reference** | `#toolname` syntax for specific tools |
+| **Add Context** | Add Context → MCP Resources for data context |
+| **Use Prompts** | `/mcp.openmetadata.promptname` for templates |
 
 ---
 
 ## Troubleshooting
 
-### Common Issues
+### Comprehensive Troubleshooting Matrix
 
-#### 1. **MCP Connection Failed**
-
-```bash
-# Check OpenMetadata MCP server status (both transports)
-curl -H "Authorization: Bearer YOUR_TOKEN" \
-  http://localhost:8585/mcp
-
-# Test SSE endpoint
-curl -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Accept: text/event-stream" \
-  http://localhost:8585/mcp/sse
-
-# Verify token validity
-curl -H "Authorization: Bearer YOUR_TOKEN" \
-  http://localhost:8585/api/v1/users/me
-
-# Check if MCP Application is installed
-curl -H "Authorization: Bearer YOUR_TOKEN" \
-  http://localhost:8585/api/v1/apps/name/McpApplication
-```
-
-**Solutions:**
-- Verify OpenMetadata is running and accessible  
-- Check that MCP Application is installed (Settings → Apps → MCP Application)
-- Verify token expiration and permissions
-- Ensure correct MCP endpoint URLs (SSE vs Streamable HTTP)
-- Check network connectivity and firewall rules
-
-#### 2. **Authentication Errors**
-
-```bash
-# Test token manually
-export AUTH_TOKEN="your-token-here"
-curl -H "Authorization: Bearer $AUTH_TOKEN" \
-  http://localhost:8585/api/v1/tables
-```
-
-**Solutions:**
-- Regenerate Personal Access Token
-- Check token format (must include "Bearer " prefix)
-- Verify user permissions in OpenMetadata
-- Ensure token hasn't expired
-
-#### 3. **Claude Desktop Not Recognizing MCP**
-
-**Solutions:**
-- Restart Claude Desktop completely
-- Check `claude_desktop_config.json` syntax
-- Verify file location and permissions
-- Enable developer mode in Claude settings
-
-#### 4. **VS Code MCP Extension Issues**
-
-**Solutions:**
-- Ensure VS Code v1.102+ (MCP generally available)
-- Check if MCP is enabled in organization policies
-- Verify `.vscode/mcp.json` syntax and location
-- Use `MCP: Show Installed Servers` to check status
-- Run `MCP: List Servers` for detailed server info
-- Check MCP server output with `MCP: Show Output`
-
-#### 5. **Tool Limits in VS Code**
-
-**Error: "Cannot have more than 128 tools per request"**
-
-**Solutions:**
-- Reduce enabled tools in agent mode tools picker
-- Deselect unnecessary MCP servers
-- Use tool sets to group related tools
-- Reference specific tools with `#toolname` syntax
-
-#### 6. **VS Code Dev Container MCP Issues**
-
-**Solutions:**
-- Verify `devcontainer.json` MCP configuration
-- Check container network connectivity to OpenMetadata
-- Ensure MCP server dependencies are installed in container
-- Validate environment variables in containerized environment
-
-### Debug Commands
-
-```bash
-# Test MCP server directly (SSE transport)
-npx -y mcp-remote http://localhost:8585/mcp/sse \
-  --auth-server-url=http://localhost:8585/mcp \
-  --client-id=openmetadata \
-  --header "Authorization:Bearer YOUR_TOKEN" \
-  --verbose
-
-# Test Streamable HTTP transport  
-curl -X POST http://localhost:8585/mcp \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"jsonrpc":"2.0","id":"test","method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test-client","version":"1.0.0"}}}'
-
-# Check OpenMetadata server logs
-docker logs openmetadata_server
-
-# Verify MCP Application installation and configuration
-curl -H "Authorization: Bearer YOUR_TOKEN" \
-  http://localhost:8585/api/v1/apps/name/McpApplication
-
-# Check available tools list via MCP
-curl -X POST http://localhost:8585/mcp \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
-  -H "Mcp-Session-Id: test-session" \
-  -d '{"jsonrpc":"2.0","id":"tools-test","method":"tools/list"}'
-
-# VS Code specific debugging
-# Check MCP server status in VS Code
-# Command Palette: "MCP: List Servers"
-# Command Palette: "MCP: Show Installed Servers" 
-# Command Palette: "MCP: Show Output" (for specific server)
-
-# Test VS Code MCP configuration
-# Open .vscode/mcp.json and use editor lenses to start/stop servers
-```
+| Issue Category | Specific Issue | Symptoms | Quick Fixes | Detailed Solutions | Debug Commands |
+|----------------|----------------|----------|-------------|-------------------|----------------|
+| **Connection** | MCP server not responding | Server connection timeout, no tool access | Check OpenMetadata running, MCP app installed, token valid | Verify OpenMetadata accessible at `http://localhost:8585`, ensure MCP Application installed (Settings → Apps → MCP Application), check network connectivity, validate firewall rules | `npx -y mcp-remote http://localhost:8585/mcp/sse --header "Authorization:Bearer TOKEN" --verbose --clean` |
+| **Authentication** | Auth failures | 401/403 responses, permission denied | Regenerate token, check "Bearer " prefix, verify permissions | Create new Personal Access Token, ensure "Bearer " prefix in auth header, verify user permissions in OpenMetadata, check token expiration | `curl -H "Authorization: Bearer TOKEN" http://localhost:8585/api/v1/users/me` |
+| **Claude Desktop** | Tools not visible | No MCP tools appearing in Claude | Restart Claude, check config syntax, verify file location | Restart Claude Desktop completely, validate `claude_desktop_config.json` syntax, check file location and permissions, enable developer mode | Verify config file location and restart Claude Desktop |
+| **VS Code** | Tools not showing | MCP features unavailable, tools not in agent mode | Ensure v1.102+, check MCP enabled, verify config syntax | Update VS Code to v1.102+, verify MCP enabled in organization policies, check `.vscode/mcp.json` syntax, use `MCP: Show Installed Servers` | Command Palette: `MCP: Show Output`, `MCP: List Servers` |
+| **Tool Limits** | Too many tools error | "Cannot have >128 tools" message | Reduce enabled tools, use tool sets, reference specific tools | Deselect unnecessary MCP servers, reduce enabled tools in agent mode, use tool sets for grouping, reference tools with `#toolname` | Check active tool count in VS Code agent mode |
+| **Network** | Connection timeouts | Slow responses, intermittent failures | Check firewall rules, verify DNS resolution, test connectivity | Check firewall rules, verify DNS resolution, test network connectivity, consider VPN for remote access | `curl -v http://localhost:8585/api/v1/health` |
+| **Token Issues** | Intermittent auth failures | Sporadic permission errors | Set up token monitoring, use 60-day tokens, implement renewal | Set up token expiration monitoring, use 60-day tokens, implement auto-renewal process | `curl -H "Authorization: Bearer TOKEN" http://localhost:8585/api/v1/apps/name/McpApplication` |
+| **Performance** | Slow MCP responses | Delayed tool execution, timeouts | Monitor server resources, optimize queries, check database | Monitor OpenMetadata server resources, implement query optimization, check database performance, scale infrastructure | `docker logs openmetadata_server` |
+| **Tool Discovery** | Tools not appearing | Available tools not showing | Verify tool definitions, check capabilities, validate permissions | Verify tool definitions in `tools.json`, check server capabilities, validate user permissions for tools | `curl -X POST http://localhost:8585/mcp -H "Authorization: Bearer TOKEN" -d '{"jsonrpc":"2.0","method":"tools/list"}'` |
+| **Transport** | HTTP vs SSE issues | Connection method problems | Test alternative transport, verify endpoint | Test Streamable HTTP vs SSE transport, verify correct endpoint URLs | `curl -X POST http://localhost:8585/mcp -H "Authorization: Bearer TOKEN" -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":"test","method":"initialize"}'` |
 
 ---
 
 ## Best Practices
 
-### 🔐 Security
+### Security
 
-1. **Token Management**
-   - Use short-lived tokens (30-60 days)
-   - Rotate tokens regularly
-   - Store tokens securely (environment variables)
-   - Never commit tokens to version control
+| Practice | Implementation | Detailed Guidance |
+|----------|----------------|------------------|
+| **Token Management** | Use 30-60 day expiration, rotate regularly, store in env vars | Create dedicated service accounts for MCP access, implement automated token rotation, never commit tokens to version control, use secure secret management |
+| **Access Control** | Create dedicated service accounts, apply least privilege, use RBAC | Create MCP-specific service accounts, grant minimum required permissions, implement role-based access control, monitor access patterns |
+| **Network Security** | Use HTTPS in production, implement firewalls, monitor traffic | Enable HTTPS for production deployments, configure network firewalls, consider VPN for remote access, implement network traffic monitoring |
 
-2. **Access Control**
-   - Create dedicated service accounts for MCP
-   - Apply principle of least privilege
-   - Use role-based access control
-   - Monitor token usage and access patterns
+### Performance
 
-3. **Network Security**
-   - Use HTTPS in production
-   - Implement network firewalls
-   - Consider VPN for remote access
-   - Monitor network traffic
+| Area | Best Practices | Implementation Details |
+|------|----------------|----------------------|
+| **Queries** | Use specific queries vs broad searches, implement caching, limit result sets | Prefer specific entity queries over broad searches, implement result caching where appropriate, use pagination for large datasets, optimize query patterns |
+| **Resources** | Monitor MCP server usage, configure timeouts, implement rate limiting | Monitor OpenMetadata server resources, configure appropriate request timeouts, implement rate limiting for heavy usage, scale infrastructure as needed |
 
-### 🚀 Performance
+### Operations
 
-1. **Query Optimization**
-   - Use specific queries instead of broad searches
-   - Implement caching where appropriate
-   - Limit result sets for large datasets
-   - Use pagination for large responses
+| Category | Practices | Implementation |
+|----------|-----------|----------------|
+| **Monitoring** | Health checks, auth failure alerts, query performance tracking | Set up MCP server health checks, monitor authentication failures, track query performance in VS Code agent mode, implement service disruption alerts |
+| **Configuration** | Version control configs, use Settings Sync, document setups | Version control `.vscode/mcp.json` files, use Settings Sync for user configurations, document MCP server configurations, manage configs in Dev Containers |
+| **Team Collaboration** | Share workspace configs, consistent naming, document patterns | Share workspace MCP configs via `.vscode/mcp.json`, use consistent server naming conventions, document team MCP usage patterns, create reusable prompt files |
 
-2. **Resource Management**
-   - Monitor MCP server resource usage
-   - Configure appropriate timeouts
-   - Implement rate limiting
-   - Scale OpenMetadata appropriately
+### Usage Patterns
 
-### 📋 Operational
+| Pattern | Good Example | Avoid | Best Practices |
+|---------|--------------|-------|----------------|
+| **Specific Queries** | "Show tables in sales database with customer data" | "Show me everything" | Provide context, use specific entity types, include relevant filters |
+| **Tool Selection** | Enable only needed tools (stay under 128 limit) | Enable all available tools | Strategic tool selection, use tool sets for workflows, reference tools directly with `#toolname` |
+| **Context Requests** | "Find PII data for GDPR compliance with retention policies" | "Find some data" | Include business context, specify compliance requirements, mention specific use cases |
+| **Iterative Exploration** | Start broad → narrow down → specific details | Random queries | Begin with discovery, progressively narrow scope, use previous results to guide next queries |
 
-1. **Monitoring**
-   - Set up health checks for MCP server
-   - Monitor authentication failures
-   - Track query performance in VS Code agent mode
-   - Alert on service disruptions
-   - Use VS Code's MCP server output logs
+### Additional Best Practices
 
-2. **Configuration Management**
-   - Version control `.vscode/mcp.json` files
-   - Use Settings Sync for user configurations
-   - Document MCP server configurations
-   - Manage MCP configs in Dev Containers
-   - Enable auto-discovery for team consistency
+| Category | Practice | Details |
+|----------|----------|---------|
+| **Backup & Recovery** | Regular OpenMetadata backups, document configurations | Implement regular OpenMetadata backups, document MCP configurations, test disaster recovery procedures, version control configurations |
+| **Team Setup** | Standardized configurations, shared documentation | Create team-wide MCP configuration standards, maintain shared documentation, implement onboarding procedures for new team members |
+| **Monitoring & Alerting** | Proactive monitoring, performance tracking | Monitor MCP server performance, track usage patterns, implement alerting for failures, regular health checks |
+| **Development Workflow** | Integration with CI/CD, testing procedures | Integrate MCP configs with CI/CD pipelines, implement testing procedures for MCP functionality, maintain development environment consistency |
 
-3. **Backup & Recovery**
-   - Regular OpenMetadata backups
-   - Document MCP configurations
-   - Test disaster recovery procedures
-   - Version control configurations
-   - Backup VS Code user settings
+### Tool Discovery Best Practices
 
-4. **Team Collaboration**
-   - Share workspace MCP configs via `.vscode/mcp.json`
-   - Use consistent server naming conventions
-   - Document team MCP usage patterns
-   - Create reusable prompt files with MCP tools
-   - Set up tool sets for common workflows
-
-### 🎯 Usage Patterns
-
-1. **Efficient Queries**
-   ```python
-   # Good: Specific queries
-   "Show me tables in the sales database with customer data"
-   
-   # Avoid: Overly broad queries
-   "Show me everything in the database"
-   ```
-
-2. **VS Code Agent Mode Best Practices**
-   ```python
-   # Use tool selection strategically
-   # Enable only needed OpenMetadata tools to stay under 128 tool limit
-   
-   # Reference tools directly when needed
-   # Use #metadata_search instead of enabling all tools
-   
-   # Use MCP resources for context
-   # Add specific table schemas as context before analysis
-   ```
-
-3. **Contextual Requests**
-   ```python
-   # Good: Provide context
-   "I'm working on GDPR compliance. Find all tables with PII data and their retention policies"
-   
-   # Avoid: Vague requests
-   "Find some data"
-   ```
-
-4. **Iterative Exploration**
-   ```python
-   # Start broad, then narrow down
-   "What databases do we have?" → 
-   "What tables are in the customer database?" → 
-   "Show me the schema for the users table"
-   ```
-
-5. **Tool Sets and Custom Modes**
-   ```python
-   # Create tool sets for common workflows
-   # Group OpenMetadata tools with related VS Code tools
-   # Use in custom chat modes or prompt files
-   ```
-
----
-
-## Conclusion
-
-OpenMetadata's MCP integration represents a significant step forward in AI-powered data management. By providing direct access to your metadata graph, AI tools can now offer intelligent assistance for:
-
-- **Data Discovery** - Find and explore data assets naturally
-- **Impact Analysis** - Understand dependencies and changes  
-- **Governance** - Automate compliance and quality checks
-- **Documentation** - Generate and maintain data documentation
-- **Monitoring** - Proactive data pipeline and quality monitoring
-
-Whether we choose OpenMetadata or DataHub for MCP depends on your specific needs, but OpenMetadata's integrated approach offers a compelling vision for the future of AI-assisted data management.
-
-### Next Steps
-
-1. **Try the Setup** - Follow our [quick start guide](#setup-guide)
-2. **Explore Use Cases** - Experiment with different [MCP capabilities](#use-cases--examples)
-3. **Join the Community** - Connect with other users on [OpenMetadata Slack](https://slack.open-metadata.org/)
-4. **Contribute** - Share your MCP experiences and use cases
-5. **Stay Updated** - Follow [OpenMetadata releases](https://github.com/open-metadata/OpenMetadata/releases) for new MCP features
+| Practice | Implementation |
+|----------|----------------|
+| **Start with Discovery** | Always check what tools are actually available first, verify tool capabilities before complex workflows |
+| **Test Gradually** | Try simple operations before complex workflows, validate permissions and access patterns |
+| **Check Permissions** | Ensure your OpenMetadata user has necessary access, verify RBAC settings for tool usage |
+| **Monitor Logs** | Use MCP server output to debug tool issues, track performance and error patterns |
 
 ---
 
 ## Additional Resources
 
-### **Official Documentation**
-- 📖 [OpenMetadata MCP Documentation](https://docs.open-metadata.org/latest/how-to-guides/mcp)
-- 📖 [OpenMetadata v1.8.x MCP Guide](https://docs.open-metadata.org/v1.8.x/how-to-guides/mcp)
-- 📖 [VS Code MCP Documentation](https://code.visualstudio.com/docs/copilot/chat/mcp-servers)
-- 🌐 [Model Context Protocol Specification](https://modelcontextprotocol.io/)
+### Official Documentation
 
-### **OpenMetadata Resources**
-- 💬 [OpenMetadata Slack #mcp Channel](https://slack.open-metadata.org/)
-- 🔧 [OpenMetadata GitHub Repository](https://github.com/open-metadata/OpenMetadata)
-- 🔧 [OpenMetadata MCP Source Code](https://github.com/open-metadata/OpenMetadata/tree/main/openmetadata-mcp)
-- 📋 [OpenMetadata MCP Application Config](https://github.com/open-metadata/OpenMetadata/tree/main/openmetadata-ui/src/main/resources/ui/public/locales/en-US/Applications/McpApplication.md)
+| Resource | Link |
+|----------|------|
+| **OpenMetadata MCP Docs** | [docs.open-metadata.org/latest/how-to-guides/mcp](https://docs.open-metadata.org/latest/how-to-guides/mcp) |
+| **VS Code MCP Docs** | [code.visualstudio.com/docs/copilot/chat/mcp-servers](https://code.visualstudio.com/docs/copilot/chat/mcp-servers) |
+| **MCP Specification** | [modelcontextprotocol.io](https://modelcontextprotocol.io/) |
 
-### **MCP Ecosystem**
-- 🛠️ [VS Code Curated MCP Servers](https://code.visualstudio.com/mcp)
-- 🔧 [MCP Server Repository](https://github.com/modelcontextprotocol/servers)
-- 📋 [DataHub MCP Server](https://github.com/acryldata/mcp-server-datahub)
+### Community & Support
 
-### **Video & Community**
-- 🎥 [MCP Introduction Video](https://www.youtube.com/watch?v=AuYBaXC8-M4)
-- 📺 [OpenMetadata YouTube Channel](https://www.youtube.com/@open-metadata)
-- 💬 [OpenMetadata Community Forums](https://github.com/open-metadata/OpenMetadata/discussions)
+| Resource | Purpose |
+|----------|---------|
+| **OpenMetadata Slack** | [#mcp channel](https://slack.open-metadata.org/) |
+| **GitHub Repository** | [OpenMetadata/OpenMetadata](https://github.com/open-metadata/OpenMetadata) |
+| **Community Forums** | [GitHub Discussions](https://github.com/open-metadata/OpenMetadata/discussions) |
 
 ---
 
-*Last updated: July 17, 2025*  
-*OpenMetadata Version: 1.8.0+ (MCP support added)*  
-*VS Code MCP Support: v1.102+ (Generally Available)*  
-*MCP Protocol Version: 2024-11-05*
+*Last updated: July 17, 2025 | OpenMetadata v1.8.0+ | VS Code v1.102+ | MCP Protocol v2024-11-05*
