@@ -4,24 +4,19 @@ source:
   serviceConnection:
     config:
       type: Fivetran
-      apiKey: ${FIVETRAN_API_KEY}
-      apiSecret: ${FIVETRAN_API_SECRET}
-      hostPort: ${FIVETRAN_HOST_PORT}
-      limit: ${FIVETRAN_LIMIT}
+      apiKey: 1krqfv3lSAfH6w6p
+      apiSecret: gjEHPTtjKpzeGXNhT8rbxtCqO70A13mm
   sourceConfig:
     config:
       type: PipelineMetadata
-      # Enhanced lineage configuration for automatic data flow capture
       lineageInformation:
-        # Add your Snowflake service name for automatic lineage mapping
         dbServiceNames:
-          - "snowflake-code"
+          - "snowflake"
         storageServiceNames:
           - "s3_iceberg_fivetran_prod"
       includeTags: true
       includeLineage: true
       includeOwners: true
-      # Enable enhanced lineage extraction
       enableDebugLog: true
       pipelineFilterPattern:
         includes: [".*"]
@@ -32,8 +27,8 @@ sink:
 workflowConfig:
   loggerLevel: INFO
   openMetadataServerConfig:
-    hostPort: ${OPENMETADATA_SERVER_HOST_PORT}
+    hostPort: "http://localhost:8585/api"
     authProvider: openmetadata
     securityConfig:
-      jwtToken: ${OPENMETADATA_JWT_TOKEN}
+      jwtToken: "eyJraWQiOiJHYjM4OWEtOWY3Ni1nZGpzLWE5MmotMDI0MmJrOTQzNTYiLCJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJvcGVuLW1ldGFkYXRhLm9yZyIsInN1YiI6ImluZ2VzdGlvbi1ib3QiLCJyb2xlcyI6WyJJbmdlc3Rpb25Cb3RSb2xlIl0sImVtYWlsIjoiaW5nZXN0aW9uLWJvdEBvcGVuLW1ldGFkYXRhLm9yZyIsImlzQm90Ijp0cnVlLCJ0b2tlblR5cGUiOiJCT1QiLCJpYXQiOjE3NTI3NTE1MjMsImV4cCI6bnVsbH0.Y5aaJyJcDHv1kkH_v2txOWLGau21voCFNgmZ_wZRUapVy0KhGbNkjeAjDEVOKOaXvxdBw1O4Hy3PAXp0e406NAf1Cw2aaROxFs5j5Sg9BAA3ONwSKPGtCN1vjcabjrfX5ZEkKMUTppFo2Ai3u3xlHTErgJsFNA0BwppANxFKAKHq5mjIJFOnFCrsc7IDSKmBdg9snJfXkvKIQjFSmz8b9CIEbbHqbBxERYY4b1RT5633iNHygPkHFUEjSkJDyHQIns-2wRaf3Xgo7BC0R5nr1bSxnY7S8as7Z2pDnxW7-AEg6xDxyigvBRZqK_4DUk79GQdrNaCJ0H3OGWoIR2KOZQ"
     storeServiceConnection: true

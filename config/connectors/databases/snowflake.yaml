@@ -1,0 +1,36 @@
+source:
+  type: snowflake
+  serviceName: snowflake
+  serviceConnection:
+    config:
+      type: Snowflake
+      username: SVC_OPEN_METADATA_STAGING_USER
+      warehouse: PLATFORM_TEAM
+      account: NEWRELICORG-DATAOS.snowflakecomputing.com
+      database: CONFORMED_STAGING
+      role: SVC_OPEN_METADATA_STAGING_ROLE
+      privateKey: "-----BEGIN ENCRYPTED PRIVATE KEY-----\nMIIFJDBWBgkqhkiG9w0BBQ0wSTAxBgkqhkiG9w0BBQwwJAQQligVkhOTO7TY0c3C\nWOtc1AICCAAwDAYIKoZIhvcNAgkFADAUBggqhkiG9w0DBwQI1wDaKlmicMgEggTI\n2MD3eoFjSTAvJqgvTvNSMLW7GHxaO6urUDzrzYuaUM/cvoQy2sve+C8uQLEMLxqD\nHxpMdQ+XKqUVMwsFXXBWoFpcIb9DmyDIXomwjORRAaI/LGNZhLEJApkBXzUcAqM7\nmmJej3TZMclauzsCnJQ/vgufqHJrasp7ufNwJ8rjGGvY5VNkiycrUOi/z/UopIj+\nUmlYwnkscr+51BhdhhLGA+i3HwLVpjKp/IP6K30wE39CXJked1OP5DaY1UzdoB9m\nnNkfuNwwCdcyqOF+q9MgHEbH5SHBfqjHjo+jjuL5W1PA8tOLSrsJRIb1BUgIMaGo\nWzy0013Olb8skQ7dgvshaxTCmwPASBYhAuVxSXSgAoHKgKpJjyr/yV10s0OJR8vo\nEA1VmdrSEkRmx2jeOUmL7ElG0cmpaUM5BbzPBtgrfugIBG0nwufGf1b9ufr1B1z6\nxN+M+AnTnkF44PGSCas1pENhiRJmMiq6p4Dzeaq/dgebTAwlsrAMs1258CeEDBpi\nvd8dCRwmIzU3EleGteIvM2cTczP1GjEfmSz0wp0+WncijFP46JousMxIm7/MSHXI\nNKvMHMXJdWfs/54xc+lkbydnvkhWxU+GWVReDwZlaHtOPz8EgSeIrzlHVu0KsVMW\nxLBO1lIwDuwZ+hS6yvh7GTpHqL1UmdjqXPW3Ib9PQQjcn9DsCsXs3qidvXIQzaa/\nmZo7uE5FMKHcN1HCDk+tanutBby+HpYRPbcbq1IQqF3CR1UD8oTGt8yT2qwYDsGj\n7UzfoPf49Nb9FPzx4dhaEgYw0N9ptNc7Y6mFj9vsFm5QCp3WpN6Ltz5FxxwxLqV3\nQRv03jT44Ubaicy3pHcNEHIqhXYTL498IdYBy+hysBn3Sb5VF00q6fh1V6+H+w7w\nT2c30XEVj8FIYyU17hcZ/0yft8KP5ZnMQ5K/SdL4NXx7GY4ktcgv3g5/G9LuzHQH\nO63vjDq7zXIfeHZt95tJJuzN/LQULjQIfToJaVhH7oNQQJ+u51W9nTFKBMRdMpMG\nudxnd9fT7+G410+7/BqVrV06nPcieYOqNdG9OouI7omgSSyuie9TsbR9lTPHY5KH\nvxx8BWL2HJgyUtVPrp7bR6zuArAE5CHQv990kYfvQpqR/UpLwo/Ff/+YzI31uU3u\ncWagsGmXMtem6F59jGWO8YpVoYZnyM2j0KgkJOBlNJ3SJlUgiRqXTwstd0ducn99\n1GIDSWr01StsZwxgIhonFLMjAmqMkpug2aXv1LNce46TYtSwZ4hVa18dXXXdXos7\nkyOL/We1iu5IcLUi/XXIiIDetm8wvmXF4aAAGZJN0DcqHs06i6pLA9hVPcLMwlEK\n8Fj5PCMVByDsBUCCCavgp4TZ4973fag5dS1tZqmdSqemMGy4mo4Mi/Bgdwu3E+hR\nLM5QToLJMOTA0DxyagHmKQSW9A4q1vVPy1kBYS6wo3h/eOSljMAoGLceEWXlwTKP\n8N6WiyrQYr6U46rIVQyhcVn7iW/g5yOyi9zj5sIARtfRtzG6BH3P9jgWLvadpFUw\nK2WAcDPe62AT4E1Tb/DO3t8ZogPNaqLX8NjJ4e3Z2Ty/+uQ+dFjSPqqAbu8zqEkc\nZpvarvCwaNzXjx7B2NgssNEuaWKwfH0H\n-----END ENCRYPTED PRIVATE KEY-----\n"
+      snowflakePrivatekeyPassphrase: NEWRELIC
+      includeTransientTables: false
+      includeStreams: false
+      clientSessionKeepAlive: false
+
+  sourceConfig:
+    config:
+      type: DatabaseMetadata
+      markDeletedTables: true
+      markDeletedStoredProcedures: true
+      includeTables: true
+      includeViews: true
+
+sink:
+  type: metadata-rest
+  config: {}
+workflowConfig:
+  loggerLevel: INFO
+  openMetadataServerConfig:
+    hostPort: "http://localhost:8585/api"
+    authProvider: openmetadata
+    securityConfig:
+      jwtToken: "eyJraWQiOiJHYjM4OWEtOWY3Ni1nZGpzLWE5MmotMDI0MmJrOTQzNTYiLCJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJvcGVuLW1ldGFkYXRhLm9yZyIsInN1YiI6ImluZ2VzdGlvbi1ib3QiLCJyb2xlcyI6WyJJbmdlc3Rpb25Cb3RSb2xlIl0sImVtYWlsIjoiaW5nZXN0aW9uLWJvdEBvcGVuLW1ldGFkYXRhLm9yZyIsImlzQm90Ijp0cnVlLCJ0b2tlblR5cGUiOiJCT1QiLCJpYXQiOjE3NTI3NTE1MjMsImV4cCI6bnVsbH0.Y5aaJyJcDHv1kkH_v2txOWLGau21voCFNgmZ_wZRUapVy0KhGbNkjeAjDEVOKOaXvxdBw1O4Hy3PAXp0e406NAf1Cw2aaROxFs5j5Sg9BAA3ONwSKPGtCN1vjcabjrfX5ZEkKMUTppFo2Ai3u3xlHTErgJsFNA0BwppANxFKAKHq5mjIJFOnFCrsc7IDSKmBdg9snJfXkvKIQjFSmz8b9CIEbbHqbBxERYY4b1RT5633iNHygPkHFUEjSkJDyHQIns-2wRaf3Xgo7BC0R5nr1bSxnY7S8as7Z2pDnxW7-AEg6xDxyigvBRZqK_4DUk79GQdrNaCJ0H3OGWoIR2KOZQ"
+    storeServiceConnection: true
